@@ -1,0 +1,30 @@
+{
+  "id": "mtnclock_plus",
+  "name": "Mountain Pass World Clock",
+  "shortName": "Mtn Clock+",
+  "version": "0.05",
+  "description": "A clock that changes scenery based on time and weather.",
+  "readme":"README.md",
+  "custom": "custom.html",
+  "icon": "app.png",
+  "screenshots": [
+    {"url":"screenshot1.png"},
+    {"url":"screenshot2.png"},
+    {"url":"screenshot3.png"},
+    {"url":"screenshot4.png"},
+    {"url":"screenshot5.png"}
+  ],
+  "type": "clock",
+  "tags": "clock",
+  "supports": ["BANGLEJS","BANGLEJS2"],
+  "allow_emulator": true,
+  "storage": [
+    {"name":"mtnclock_plus.app.js","url":"app.js"},
+    {"name":"mtnclock_plus.settings.js","url":"settings.js"},
+    {"name":"mtnclock_plus.img","url":"app-icon.js","evaluate":true}
+  ],
+  "data": [
+    {"name":"mtnclock_plus.json"},
+    {"name":"mtnclock_plus.settings.json"}
+  ]
+}
