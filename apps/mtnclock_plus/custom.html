@@ -1,0 +1,134 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="../../css/spectre.min.css">
+		<style>
+			input.offset {
+					width: 80px;
+			}
+			input.name {
+					width: 150px;
+			}
+		</style>
+  </head>
+  <body>
+    
+    <p>You can add up to 3 additional rows. These rows can be a clock for a different time zone, an AQI (air quality index), or an AQI plus temperature. The AQI and temp are sourced from IQAir, which requires "Allow Internet Access" to be enabled in Gadgetbridge.</p>
+		<p>To use AQI, you need an IQAir API key. To get one for free, create an IQAir account, then create an API key in <a target="_blank" href="https://dashboard.iqair.com/personal/api-keys">your user dashboard</a>.</p>
+		<p>To specify the IQAir source, find your city on the IQAir website, then copy and paste the URL. It should look something like https://www.iqair.com/usa/new-york/new-york-city</p>
+    
+    <table id="rows" class="table table-scroll">
+      <tr>
+        <th>Mode</th>
+        <th>Name</th>
+        <th>UTC Offset</th>
+				<th>IQAir URL</th>
+      </tr>
+    </table>
+
+    <input id="api-key" type="text" placeholder="IQAir API Key"></input>
+		<br>
+    <button id="upload" class="btn btn-primary">Upload</button>
+
+		<template id="row-template">
+			<tr class="row">
+				<td>
+					<select class="mode">
+						<option class="option-disabled" value="disabled">Disabled</option>
+						<option class="option-clock" value="clock">World Clock</option>
+						<option class="option-iqair" value="iqair">IQAir</option>
+						<option class="option-iqairt" value="iqairt">IQAir + Temp</option>
+					</select>
+				</td>
+				<td>
+					<input type="text" class="name"></input>
+				</td>
+				<td>
+					<input type="number" class="offset"></input>
+				</td>
+				<td>
+					<input type="text" class="url"></input>
+				</td>
+			</tr>
+		</template>
+
+    <script src="../../core/lib/customize.js"></script>
+
+    <script>
+			const rowCount = 3;
+			var storedString = localStorage.getItem('mtnclock_plus-config');
+			var stored = {};
+			if (storedString) {
+				stored = JSON.parse(storedString);
+			}
+
+			if (stored.apiKey) {
+				document.getElementById("api-key").value = stored.apiKey;
+			}
+
+			if (!stored.rows || stored.rows.length != rowCount) {
+				stored.rows = [
+					{
+						mode: "clock",
+						name: "London",
+						offset: 1,
+						url: "https://www.iqair.com/uk/england/london"
+					},
+					{
+						mode: "clock",
+						name: "NY",
+						offset: -4,
+						url: "https://www.iqair.com/usa/new-york/new-york-city"
+					},
+					{
+						mode: "clock",
+						name: "Denver",
+						offset: -6,
+						url: "https://www.iqair.com/usa/colorado/denver"
+					}
+				];
+			}
+
+			var tbl = document.getElementById("rows");
+			var tmp = document.getElementById("row-template");
+			for (var i = 0; i < rowCount; i++) {
+				var row = tmp.content.cloneNode(true);
+				// Rows are stored in reversed order because they are drawn from the bottom up on the watch
+				var storedRow = stored.rows.toReversed()[i]
+				row.querySelector(".option-" + storedRow.mode).selected = "selected";
+				row.querySelector(".name").value = storedRow.name;
+				row.querySelector(".offset").value = storedRow.offset;
+				row.querySelector(".url").value = storedRow.url;
+				tbl.append(row);
+			}
+
+			document.getElementById("upload").addEventListener("click", function() {
+				var config = {
+					rows: [],
+					apiKey: document.getElementById("api-key").value
+				};
+
+				document.querySelectorAll(".row").forEach((row) => {
+					// Rows are stored in reversed order because they are drawn from the bottom up on the watch
+          config.rows.unshift({
+						mode: row.querySelector(".mode").value,
+						name: row.querySelector(".name").value,
+						offset: row.querySelector(".offset").value,
+						url: row.querySelector(".url").value
+					});
+				});
+
+				localStorage.setItem('mtnclock_plus-config', JSON.stringify(config));
+
+				// send finished app (in addition to contents of app.json)
+				sendCustomizedApp({
+					storage:[
+						{
+							name: "mtnclock_plus.settings.json",
+							content: JSON.stringify(config)
+						},
+					]
+				});
+			});
+    </script>
+  </body>
+</html>
